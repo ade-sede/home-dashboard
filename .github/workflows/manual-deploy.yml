@@ -1,0 +1,130 @@
+name: Manual Deployment
+on:
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          
+      - name: Stop existing service
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh deployer@$DEPLOY_HOST "sudo systemctl stop home-dashboard || true"
+          
+      - name: Create app directory
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          APP_DIR: /opt/home-dashboard-service
+        run: |
+          # WARNING deleting old files meaning we can't recover if deployment fail
+          # Fine by me as I don't really need reliability at the moment
+          ssh deployer@$DEPLOY_HOST "
+            sudo mkdir -p $APP_DIR
+            sudo rm -rf $APP_DIR/*
+            sudo chown deployer:deployer $APP_DIR
+            sudo chmod 755 $APP_DIR
+          "
+          
+      - name: Copy code to server
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          APP_DIR: /opt/home-dashboard-service
+        run: |
+          rsync -avz --exclude '.git' --exclude '.github' ./backend/ deployer@$DEPLOY_HOST:$APP_DIR/
+          
+      - name: Setup service file
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          scp ./backend/infra/templates/home-dashboard.service deployer@$DEPLOY_HOST:/tmp/
+          ssh deployer@$DEPLOY_HOST "
+            sudo mv /tmp/home-dashboard.service /etc/systemd/system/
+            sudo systemctl daemon-reload
+          "
+          
+      - name: Create environment files
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          APP_DIR: /opt/home-dashboard-service
+        run: |
+          echo "${{ secrets.LEGS }}" > legs.csv
+          scp legs.csv deployer@$DEPLOY_HOST:$APP_DIR/legs.csv
+          rm legs.csv
+          
+          ssh deployer@$DEPLOY_HOST "
+            cd $APP_DIR &&
+            echo \"LEGS_FILE=$APP_DIR/legs.csv\" > .env &&
+            echo \"AUTH_USERNAME=${{ secrets.USERNAME }}\" >> .env &&
+            echo \"AUTH_PASSWORD=${{ secrets.PASSWORD }}\" >> .env &&
+            chmod 600 .env &&
+            chmod 600 legs.csv
+          "
+          
+      - name: Install dependencies
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          APP_DIR: /opt/home-dashboard-service
+        run: |
+          ssh deployer@$DEPLOY_HOST "
+            cd $APP_DIR && 
+            sudo rm -rf .venv &&
+            /usr/local/bin/uv venv && 
+            source .venv/bin/activate && 
+            /usr/local/bin/uv pip install . && 
+            /usr/local/bin/uv pip install python-dotenv
+          "
+          
+      - name: Start service
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh deployer@$DEPLOY_HOST "
+            sudo systemctl enable home-dashboard
+            sudo systemctl start home-dashboard
+          "
+          
+      - name: Check service status
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh deployer@$DEPLOY_HOST "sudo systemctl status home-dashboard"
+          
+      - name: Verify API is responding
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh deployer@$DEPLOY_HOST "
+            # Set timeout and polling interval
+            timeout_seconds=30
+            poll_interval=3
+            end_time=\$((SECONDS + timeout_seconds))
+            
+            # Poll until success or timeout
+            while [ \$SECONDS -lt \$end_time ]; do
+              echo \"Checking if API is responding (\$((end_time - SECONDS)) seconds remaining)...\"
+              status_code=\$(curl -s -o /dev/null -w \"%{http_code}\" -u ${{ secrets.USERNAME }}:${{ secrets.PASSWORD }} localhost:8000/)
+              
+              if [[ \"\$status_code\" == \"200\" ]]; then
+                echo \"API is responding with status code 200!\"
+                exit 0
+              fi
+              
+              echo \"API not ready yet (status: \$status_code), waiting \$poll_interval seconds...\"
+              sleep \$poll_interval
+            done
+            
+            echo \"Timeout reached. API failed to respond correctly within \$timeout_seconds seconds.\"
+            echo \"Last status code: \$status_code\"
+            exit 1
+          "

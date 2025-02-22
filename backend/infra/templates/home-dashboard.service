@@ -1,0 +1,14 @@
+[Unit]
+Description=Home Dashboard FastAPI Service
+After=network.target
+
+[Service]
+User=deployer
+WorkingDirectory=/opt/home-dashboard-service
+ExecStart=/usr/local/bin/uv run start-server
+Restart=on-failure
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/opt/home-dashboard-service/.env
+
+[Install]
+WantedBy=multi-user.target

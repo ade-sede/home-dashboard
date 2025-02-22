@@ -1,0 +1,30 @@
+[project]
+name = "home-dashboard"
+version = "0.1.0"
+description = "A simple home dashboard"
+authors = [{ name = "Adrien DE SEDE", email = "adrien.de.sede@gmail.com" }]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+	"requests>=2.32.3,<3.0.0",
+	"gtfs-kit>=10.1.1",
+	"pandas>=2.2.3,<3.0.0",
+	"fastapi>=0.115.11,<0.116.0",
+	"apscheduler>=3.11.0,<4.0.0",
+	"uvicorn>=0.34.0,<0.35.0",
+	"python-dotenv>=1.0.0,<2.0.0",
+]
+
+[project.scripts]
+start-server = "main:start_server"
+
+[tool.hatch.build.targets.wheel]
+packages = ["main.py"]
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 80

@@ -1,0 +1,146 @@
+---
+- name: Setup VPS for deployment
+  hosts: vps
+  become: yes
+  vars_prompt:
+    - name: "domain"
+      prompt: "Enter your domain name"
+      private: no
+      default: "home-dashboard.ade-sede.com"
+    - name: "admin_email"
+      prompt: "Enter your email address for SSL certificate"
+      private: no
+      default: "your-email@example.com"
+  vars:
+    deploy_user: deployer
+    service_name: home-dashboard
+    app_port: 8000
+  
+  tasks:
+    # Install required packages
+    - name: Install required packages
+      apt:
+        name: 
+          - rsync
+          - git
+        state: present
+        update_cache: yes
+        
+    - name: Create deployment user
+      user:
+        name: "{{ deploy_user }}"
+        shell: /bin/bash
+        createhome: yes
+        state: present
+        
+    - name: Install uv package manager
+      shell: |
+        curl --proto '=https' --tlsv1.2 -LsSf https://astral.sh/uv/install.sh | sh
+      args:
+        creates: "/home/debian/.local/bin/uv"
+        warn: false
+
+    - name: Make uv available system-wide
+      copy:
+        src: "/home/debian/.local/bin/uv"
+        dest: "/usr/local/bin/uv"
+        mode: '0755'
+        remote_src: yes
+      register: uv_copy
+      
+    - name: Create SSH directory for deploy user
+      file:
+        path: "/home/{{ deploy_user }}/.ssh"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: '0700'
+    
+    - name: Generate SSH key for GitHub Actions
+      openssh_keypair:
+        path: "/home/{{ deploy_user }}/.ssh/github_actions"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: '0600'
+      register: ssh_key_result
+    
+    - name: Configure SSH authorized_keys for deploy user
+      authorized_key:
+        user: "{{ deploy_user }}"
+        key: "{{ ssh_key_result.public_key }}"
+        state: present
+    
+    - name: Setup sudoers for deployer
+      lineinfile:
+        path: /etc/sudoers.d/deployer
+        line: "{{ deploy_user }} ALL=(ALL) NOPASSWD: ALL"
+        state: present
+        create: yes
+        validate: 'visudo -cf %s'
+        mode: '0440'
+    
+    - name: Verify uv is installed
+      shell: /usr/local/bin/uv --version || echo "UV not found"
+      register: uv_version
+      changed_when: false
+      ignore_errors: true
+      
+    - name: Show uv version
+      debug:
+        var: uv_version.stdout
+        
+    # NGINX setup
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+        
+    - name: Create Nginx site config
+      template:
+        src: templates/nginx-site.conf.j2
+        dest: /etc/nginx/sites-available/home-dashboard
+        owner: root
+        group: root
+        mode: '0644'
+        
+    - name: Enable site
+      file:
+        src: /etc/nginx/sites-available/home-dashboard
+        dest: /etc/nginx/sites-enabled/home-dashboard
+        state: link
+        
+    - name: Remove default site if it exists
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Reload Nginx
+      
+    # HTTPS setup
+    - name: Install certbot and Nginx plugin
+      apt:
+        name: 
+          - certbot
+          - python3-certbot-nginx
+        state: present
+      
+    - name: Check if certificate exists
+      stat:
+        path: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+      register: cert_exists
+      
+    - name: Obtain SSL certificate
+      command: certbot --nginx -d {{ domain }} --non-interactive --agree-tos --email {{ admin_email }} --redirect
+      register: certbot_result
+      notify: Reload Nginx
+  
+    - name: Ensure Nginx is restarted
+      service:
+        name: nginx
+        state: restarted
+  
+  handlers:
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded

@@ -1,0 +1,7 @@
+*.pyc
+unzipped_gtfs
+single_leg_trips.csv
+.env
+inventory.ini
+ssh-known-host-key
+ssh-private-key
