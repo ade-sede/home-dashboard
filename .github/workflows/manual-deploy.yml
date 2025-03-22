@@ -30,9 +30,9 @@ jobs:
           # WARNING deleting old files meaning we can't recover if deployment fail
           # Fine by me as I don't really need reliability at the moment
           ssh deployer@$DEPLOY_HOST "
-            sudo mkdir -p $APP_DIR
-            sudo rm -rf $APP_DIR/*
-            sudo chown deployer:deployer $APP_DIR
+            sudo mkdir -p $APP_DIR &&
+            sudo rm -rf $APP_DIR/* &&
+            sudo chown deployer:deployer $APP_DIR &&
             sudo chmod 755 $APP_DIR
           "
           
@@ -48,10 +48,7 @@ jobs:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
           scp ./backend/infra/templates/home-dashboard.service deployer@$DEPLOY_HOST:/tmp/
-          ssh deployer@$DEPLOY_HOST "
-            sudo mv /tmp/home-dashboard.service /etc/systemd/system/
-            sudo systemctl daemon-reload
-          "
+          ssh deployer@$DEPLOY_HOST "sudo mv /tmp/home-dashboard.service /etc/systemd/system/ && sudo systemctl daemon-reload"
           
       - name: Create environment files
         env:
@@ -90,7 +87,7 @@ jobs:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
         run: |
           ssh deployer@$DEPLOY_HOST "
-            sudo systemctl enable home-dashboard
+            sudo systemctl enable home-dashboard &&
             sudo systemctl start home-dashboard
           "
           
