@@ -46,7 +46,7 @@ async def list_legs():
     }
 
 
-@trips_router.put("/force_refresh")
+@trips_router.post("/force_refresh")
 async def force_refresh():
     instance = Trips.get_instance()
     if len(instance.tracked_legs) < 1:
