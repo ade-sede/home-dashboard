@@ -7,5 +7,5 @@ Currently supported:
 
 # How to deploy
 
-See [backend/README.md](backend/README.md)
+See [service/README.md](service/README.md)
 

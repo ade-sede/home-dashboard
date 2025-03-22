@@ -45,7 +45,7 @@ pre-commit install
 - Public shared codes in well named folders at the root
 
 ## Infra
-The backend is hosted on a VPS with automated deployments via GitHub Actions.
+The service is hosted on a VPS with automated deployments via GitHub Actions.
 
 ### Infrastructure Overview
 The setup consists of two main parts:
@@ -76,7 +76,7 @@ Set up the following secrets in your GitHub repository:
 - `LEGS`: Contents of your CSV file with leg definitions (stored as a secret to avoid leaking your personal travel locations)
 
 ### Setup the VPS
-1. `cp backend/infra/inventory.tpl backend/infra/inventory.ini` and update with your server details
+1. `cp service/infra/inventory.tpl service/infra/inventory.ini` and update with your server details
 2. From the infra directory: `ansible-playbook -i inventory.ini setup-vps.yml`
    - This will prompt for your domain name and email for Let's Encrypt
    - Sets up Nginx with HTTPS, creates a deployment user, and configures the environment
