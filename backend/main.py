@@ -72,7 +72,7 @@ app.include_router(
 
 @app.get("/", dependencies=[Depends(verify_credentials)])
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "World", "status": "ok"}
 
 
 def start_server():
