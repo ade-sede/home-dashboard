@@ -45,7 +45,7 @@ pre-commit install
 - Public shared codes in well named folders at the root
 
 ## Infra
-The service is hosted on a VPS with automated deployments via GitHub Actions.
+The backend is hosted on a VPS with automated deployments via GitHub Actions.
 
 ### Infrastructure Overview
 The setup consists of two main parts:

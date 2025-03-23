@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'service/**'
   workflow_dispatch:
 jobs:
   deploy:
@@ -82,7 +84,6 @@ jobs:
             /usr/local/bin/uv venv && 
             source .venv/bin/activate && 
             /usr/local/bin/uv pip install . && 
-            /usr/local/bin/uv pip install python-dotenv
           "
           
       - name: Start service
