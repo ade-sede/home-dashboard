@@ -1,0 +1,19 @@
+{
+	"KPlugin": {
+		"Authors": [
+			{
+				"Email": "adrien.de.sede@gmail.com",
+				"Name": "Adrien DE SEDE"
+			}
+		],
+		"Category": "Date and Time",
+		"Description": "Displays transit times for configured routes",
+		"Icon": "public-transport-stop",
+		"Id": "com.github.ade-sede.home-dashboard.transit-clock",
+		"Name": "Transit Clock",
+		"Version": "1.0"
+	},
+	"X-Plasma-API": "declarativeappletscript",
+	"X-Plasma-MainScript": "ui/main.qml",
+	"KPackageStructure": "Plasma/Applet"
+}

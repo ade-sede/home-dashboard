@@ -8,4 +8,5 @@ Currently supported:
 # How to deploy
 
 See [service/README.md](service/README.md)
+See [kde-transit-widget/README.md](kde-transit-widget/README.md)
 
