@@ -8,9 +8,9 @@ Item {
     id: fullRoot
     
     Layout.minimumWidth: 350
-    Layout.preferredWidth: 450
+    Layout.preferredWidth: 600
     Layout.minimumHeight: 300
-    Layout.preferredHeight: 400
+    Layout.preferredHeight: 700
     
     ColumnLayout {
         anchors.fill: parent
