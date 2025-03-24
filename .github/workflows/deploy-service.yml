@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - 'service/**'
+      - '.github/workflows/deploy-service.yml'
   workflow_dispatch:
 jobs:
   deploy:
