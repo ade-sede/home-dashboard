@@ -83,7 +83,7 @@ jobs:
             sudo rm -rf .venv &&
             /usr/local/bin/uv venv && 
             source .venv/bin/activate && 
-            /usr/local/bin/uv pip install . && 
+            /usr/local/bin/uv pip install .
           "
           
       - name: Start service
