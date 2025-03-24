@@ -1,5 +1,7 @@
 # KDE Widget
 
+![Screenshot](./assets/screenshot.png)
+
 ## Install / Update
 
 1. Run `install.sh`
