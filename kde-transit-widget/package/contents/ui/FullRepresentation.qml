@@ -18,32 +18,46 @@ Item {
         spacing: 10
         
         // Header
-        RowLayout {
+        Column {
             Layout.fillWidth: true
+            spacing: 8
             
             PlasmaExtras.Heading {
+                width: parent.width
                 level: 2
                 text: "Transit Times"
+                horizontalAlignment: Text.AlignHCenter
+                font.letterSpacing: 1.2
             }
             
-            Item { Layout.fillWidth: true }
-            
-            PlasmaComponents.Button {
-                icon.name: "view-refresh"
-                text: "Refresh"
-                onClicked: {
-                    var rootItem = plasmoid.rootItem
-                    if (rootItem && typeof rootItem.forceRefreshCache === "function") {
-                        rootItem.forceRefreshCache()
+            RowLayout {
+                width: parent.width
+                Item { Layout.fillWidth: true }
+                
+                PlasmaComponents.Button {
+                    icon.name: "view-refresh"
+                    text: "Refresh"
+                    onClicked: {
+                        var rootItem = plasmoid.rootItem
+                        if (rootItem && typeof rootItem.forceRefreshCache === "function") {
+                            rootItem.forceRefreshCache()
+                        }
+                    }
+                }
+                
+                PlasmaComponents.Button {
+                    icon.name: "configure"
+                    onClicked: {
+                        plasmoid.action("configure").trigger()
                     }
                 }
             }
             
-            PlasmaComponents.Button {
-                icon.name: "configure"
-                onClicked: {
-                    plasmoid.action("configure").trigger()
-                }
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: PlasmaCore.Theme.disabledTextColor
+                opacity: 0.3
             }
         }
         
@@ -72,115 +86,162 @@ Item {
             
             delegate: Column {
                 Layout.fillWidth: true
-                spacing: 4
+                spacing: 8
                 width: parent.width
                 
-                // Leg header
+                // Line header with colored box and styled direction
                 RowLayout {
                     width: parent.width
                     spacing: 4
                     
-                    PlasmaComponents.Label {
-                        text: modelData.line_short_name
-                        font.bold: true
-                        font.pixelSize: theme.defaultFont.pixelSize + 2
+                    // Line number box
+                    Rectangle {
+                        width: lineLabel.width + 16
+                        height: lineLabel.height + 8
+                        radius: 4
+                        color: PlasmaCore.Theme.highlightColor
+                        
+                        PlasmaComponents.Label {
+                            id: lineLabel
+                            anchors.centerIn: parent
+                            text: modelData.line_short_name
+                            font.bold: true
+                            color: PlasmaCore.Theme.highlightedTextColor
+                        }
                     }
                     
-                    PlasmaComponents.Label {
-                        text: modelData.trip_direction
-                        font.pixelSize: theme.defaultFont.pixelSize
-                        elide: Text.ElideRight
+                    // Direction label
+                    RowLayout {
+                        spacing: 8
+                        
+                        PlasmaComponents.Label {
+                            text: "Direction:"
+                            font.bold: true
+                            opacity: 0.7
+                        }
+                        
+                        // Direction value in a subtle box
+                        Rectangle {
+                            Layout.preferredWidth: directionLabel.implicitWidth + 12
+                            height: directionLabel.height + 6
+                            color: PlasmaCore.Theme.backgroundColor
+                            opacity: 0.5
+                            radius: 3
+                            border.width: 1
+                            border.color: PlasmaCore.Theme.disabledTextColor
+                            
+                            PlasmaComponents.Label {
+                                id: directionLabel
+                                anchors.centerIn: parent
+                                text: modelData.trip_direction
+                                font.italic: true
+                                elide: Text.ElideRight
+                            }
+                        }
+                        
+                        Item {
+                            Layout.fillWidth: true
+                        }
                     }
                 }
                 
-                // From - To
-                RowLayout {
-                    width: parent.width
-                    spacing: 4
-                    
-                    PlasmaComponents.Label {
-                        text: modelData.from_stop_name
-                        font.pixelSize: theme.smallestFont.pixelSize
-                    }
-                    
-                    PlasmaComponents.Label {
-                        text: "→"
-                        font.pixelSize: theme.smallestFont.pixelSize
-                    }
-                    
-                    PlasmaComponents.Label {
-                        text: modelData.to_stop_name
-                        font.pixelSize: theme.smallestFont.pixelSize
-                    }
-                }
-                
-                // Next departures
+                // Create a fixed grid with proper cell alignment
                 GridLayout {
+                    id: timesGrid
                     width: parent.width
-                    columns: 3
-                    rowSpacing: 4
-                    columnSpacing: 8
+                    columns: 2
+                    rowSpacing: 6
+                    columnSpacing: 12
                     
                     property var legEstimate: plasmoid.rootItem.estimates[modelData.id]
                     property var departures: legEstimate && legEstimate.estimates ? 
-                                           legEstimate.estimates : []
+                                            legEstimate.estimates : []
                     
-                    // Header
-                    PlasmaComponents.Label {
-                        text: "Departure"
-                        font.bold: true
-                        Layout.preferredWidth: 80
+                    // Headers with station names
+                    Column {
                         Layout.column: 0
-                    }
-                    
-                    PlasmaComponents.Label {
-                        text: "Arrival"
-                        font.bold: true
-                        Layout.preferredWidth: 80
-                        Layout.column: 1
-                    }
-                    
-                    PlasmaComponents.Label {
-                        text: "Status"
-                        font.bold: true
-                        Layout.column: 2
                         Layout.fillWidth: true
+                        Layout.preferredWidth: parent.width * 0.5
+                        Layout.alignment: Qt.AlignHCenter
+                        
+                        PlasmaComponents.Label {
+                            width: parent.width
+                            text: "Departure from:"
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        
+                        PlasmaComponents.Label {
+                            width: parent.width
+                            text: modelData.from_stop_name
+                            font.italic: true
+                            font.underline: true
+                            horizontalAlignment: Text.AlignHCenter
+                            elide: Text.ElideRight
+                        }
                     }
                     
-                    // Estimates
+                    Column {
+                        Layout.column: 1
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: parent.width * 0.5
+                        Layout.alignment: Qt.AlignHCenter
+                        
+                        PlasmaComponents.Label {
+                            width: parent.width
+                            text: "Arrival at:"
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        
+                        PlasmaComponents.Label {
+                            width: parent.width
+                            text: modelData.to_stop_name
+                            font.italic: true
+                            font.underline: true
+                            horizontalAlignment: Text.AlignHCenter
+                            elide: Text.ElideRight
+                        }
+                    }
+                    
+                    // Generate times for each departure
                     Repeater {
-                        id: departuresRepeater
-                        model: parent.departures
+                        model: timesGrid.departures
                         
                         delegate: Item {
                             Layout.row: index + 1
-                            Layout.columnSpan: 3
+                            Layout.column: 0
+                            Layout.columnSpan: 2
                             Layout.fillWidth: true
-                            height: departureRowLayout.height
+                            height: depTimesRow.height
                             
                             GridLayout {
-                                id: departureRowLayout
+                                id: depTimesRow
                                 width: parent.width
-                                columns: 3
+                                columns: 2
+                                columnSpacing: 12
                                 
                                 PlasmaComponents.Label {
+                                    id: departureTime
                                     text: plasmoid.rootItem.formatTime(modelData.departure_time)
-                                    color: modelData.delay ? "red" : theme.textColor
-                                    Layout.preferredWidth: 80
+                                    color: modelData.delay ? "red" : (index === 0 ? theme.textColor : Qt.rgba(theme.textColor.r, theme.textColor.g, theme.textColor.b, 0.7))
+                                    font.bold: index === 0
+                                    font.pointSize: index === 0 ? theme.defaultFont.pointSize : theme.defaultFont.pointSize * 0.9
                                     Layout.column: 0
+                                    Layout.fillWidth: true
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    horizontalAlignment: Text.AlignHCenter
                                 }
                                 
                                 PlasmaComponents.Label {
                                     text: plasmoid.rootItem.formatTime(modelData.arrival_time)
-                                    Layout.preferredWidth: 80
+                                    color: index === 0 ? theme.textColor : Qt.rgba(theme.textColor.r, theme.textColor.g, theme.textColor.b, 0.7)
+                                    font.bold: index === 0
+                                    font.pointSize: index === 0 ? theme.defaultFont.pointSize : theme.defaultFont.pointSize * 0.9
                                     Layout.column: 1
-                                }
-                                
-                                PlasmaComponents.Label {
-                                    text: modelData.delay ? "Delayed: " + modelData.delay + " min" : "On time"
-                                    color: modelData.delay ? "red" : "green"
-                                    Layout.column: 2
                                     Layout.fillWidth: true
+                                    Layout.preferredWidth: parent.width * 0.5
+                                    horizontalAlignment: Text.AlignHCenter
                                 }
                             }
                         }
@@ -193,11 +254,21 @@ Item {
                            plasmoid.rootItem.estimates[modelData.id].incidents ? 
                            plasmoid.rootItem.estimates[modelData.id].incidents : []
                     
-                    delegate: PlasmaComponents.Label {
+                    delegate: RowLayout {
                         width: parent.width
-                        text: "⚠️ " + modelData.message
-                        color: "orange"
-                        wrapMode: Text.WordWrap
+                        spacing: 8
+                        
+                        PlasmaComponents.Label {
+                            text: "⚠️"
+                            font.pointSize: theme.defaultFont.pointSize * 1.2
+                        }
+                        
+                        PlasmaComponents.Label {
+                            text: modelData.message
+                            color: "orange"
+                            wrapMode: Text.WordWrap
+                            Layout.fillWidth: true
+                        }
                     }
                 }
                 
@@ -208,6 +279,8 @@ Item {
                     color: theme.disabledTextColor
                     opacity: 0.3
                     visible: index < plasmoid.rootItem.legs.length - 1
+                    Layout.topMargin: 4
+                    Layout.bottomMargin: 4
                 }
             }
         }
