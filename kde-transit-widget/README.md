@@ -6,6 +6,11 @@
 2. Log-out from KDE and log-in again
 3. Configure server and credentials using the widget's builtin configuration pane
 
+## Testing
+
+1. Update config in `package/contents/config/main.xml` (Don't commit)
+2. `plasmoidviewer -a ./package/` to see your changes live
+
 ## Disclaimer
 
 Written 95% by AI.
