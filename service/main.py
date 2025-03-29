@@ -47,7 +47,7 @@ async def lifespan(app: FastAPI):
     Trips()  # init singleton
     scheduler.add_job(
         refresh_tcl_api_cache,
-        CronTrigger.from_crontab("0 * * * *"),  # every hour
+        CronTrigger.from_crontab("*/10 * * * *"),  # every 10 minutes
     )
     scheduler.start()
 
