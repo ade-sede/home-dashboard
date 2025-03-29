@@ -11,7 +11,8 @@
 ## Testing
 
 1. Update config in `package/contents/config/main.xml` (Don't commit)
-2. `plasmoidviewer -a ./package/` to see your changes live
+2. `plasmoidviewer -a ./package/` to preview the full representation
+3. `plasmoidviewer -f horizontal -a ./package/` to preview the compact representation
 
 ## Disclaimer
 
