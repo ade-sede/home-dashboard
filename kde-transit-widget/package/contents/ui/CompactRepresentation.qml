@@ -87,7 +87,7 @@ Item {
                                               legEstimate.estimates[0] : null
                     
                     text: nextDeparture ? 
-                          plasmoid.rootItem.formatTime(nextDeparture.departure_time) : 
+                          plasmoid.rootItem.formatTime(nextDeparture.departure_time, nextDeparture.delay) : 
                           "--:--"
                     
                     Layout.minimumWidth: 36

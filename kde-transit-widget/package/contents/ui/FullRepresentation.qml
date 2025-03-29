@@ -223,7 +223,9 @@ Item {
                                 
                                 PlasmaComponents.Label {
                                     id: departureTime
-                                    text: plasmoid.rootItem.formatTime(modelData.departure_time)
+                                    text: modelData.delay ? 
+                                          plasmoid.rootItem.formatTimeWithDelay(modelData.departure_time, modelData.delay) :
+                                          plasmoid.rootItem.formatTime(modelData.departure_time)
                                     color: modelData.delay ? "red" : (index === 0 ? theme.textColor : Qt.rgba(theme.textColor.r, theme.textColor.g, theme.textColor.b, 0.7))
                                     font.bold: index === 0
                                     font.pointSize: index === 0 ? theme.defaultFont.pointSize : theme.defaultFont.pointSize * 0.9
@@ -234,8 +236,10 @@ Item {
                                 }
                                 
                                 PlasmaComponents.Label {
-                                    text: plasmoid.rootItem.formatTime(modelData.arrival_time)
-                                    color: index === 0 ? theme.textColor : Qt.rgba(theme.textColor.r, theme.textColor.g, theme.textColor.b, 0.7)
+                                    text: modelData.delay ? 
+                                          plasmoid.rootItem.formatTime(modelData.arrival_time, modelData.delay) :
+                                          plasmoid.rootItem.formatTime(modelData.arrival_time)
+                                    color: modelData.delay ? "red" : (index === 0 ? theme.textColor : Qt.rgba(theme.textColor.r, theme.textColor.g, theme.textColor.b, 0.7))
                                     font.bold: index === 0
                                     font.pointSize: index === 0 ? theme.defaultFont.pointSize : theme.defaultFont.pointSize * 0.9
                                     Layout.column: 1

@@ -87,12 +87,16 @@ async def get_next(leg_id: int):
     for trip_id, departure_time, arrival_time in leg.get_estimates():
         delay = leg.get_delays(trip_id)
 
+        delay_seconds = (
+            int(delay.delaipassage.total_seconds()) if delay else None
+        )
+
         estimates.append(
             {
                 "transporter_trip_id": trip_id,
                 "departure_time": departure_time,
                 "arrival_time": arrival_time,
-                "delay": delay.delaipassage if delay else None,
+                "delay": delay_seconds,
             }
         )
 

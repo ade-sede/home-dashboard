@@ -147,8 +147,12 @@ Item {
     }
     
     // Utility functions
-    function formatTime(timeString) {
+    function formatTime(timeString, delaySeconds) {
         var date = new Date(timeString)
+        
+        if (delaySeconds) {
+            date = new Date(date.getTime() - (delaySeconds * 1000))
+        }
         
         if (timeFormat === "24h") {
             return date.getHours() + ":" + 
@@ -162,6 +166,19 @@ Item {
                    (date.getMinutes() < 10 ? "0" : "") + date.getMinutes() + 
                    " " + ampm
         }
+    }
+    
+    function formatTimeWithDelay(timeString, delaySeconds) {
+        var formattedTime = formatTime(timeString, delaySeconds)
+        if (delaySeconds) {
+            formattedTime += " (-" + formatDelayMinutes(delaySeconds) + ")"
+        }
+        return formattedTime
+    }
+    
+    function formatDelayMinutes(delaySeconds) {
+        var minutes = Math.floor(delaySeconds / 60)
+        return minutes + (minutes === 1 ? " min" : " mins")
     }
     
     // Initial load and configuration changes
