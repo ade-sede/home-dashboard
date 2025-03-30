@@ -11,7 +11,8 @@
 		"Icon": "public-transport-stop",
 		"Id": "com.github.ade-sede.home-dashboard.transit-clock",
 		"Name": "Transit Clock",
-		"Version": "1.0"
+		"Version": "1.0",
+		"Website": "https://github.com/ade-sede/home-dashboard"
 	},
 	"X-Plasma-API": "declarativeappletscript",
 	"X-Plasma-MainScript": "ui/main.qml",

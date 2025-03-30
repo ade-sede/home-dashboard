@@ -32,7 +32,7 @@ Item {
             TextField {
                 id: serverUrlField
                 Layout.fillWidth: true
-                placeholderText: "https://home-dashboard.ade-sede.com"
+                placeholderText: "https://your-server-url.example.com"
             }
             
             Label { text: "Username:" }
