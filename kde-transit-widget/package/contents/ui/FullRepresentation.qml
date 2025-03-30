@@ -17,7 +17,6 @@ Item {
         anchors.margins: 10
         spacing: 10
         
-        // Header
         Column {
             Layout.fillWidth: true
             spacing: 8
@@ -61,7 +60,6 @@ Item {
             }
         }
         
-        // Loading indicator
         PlasmaComponents.BusyIndicator {
             Layout.alignment: Qt.AlignHCenter
             visible: plasmoid.rootItem.isLoading
@@ -70,7 +68,6 @@ Item {
             Layout.preferredHeight: 32
         }
         
-        // No data message
         PlasmaComponents.Label {
             visible: plasmoid.rootItem.legs.length === 0 && !plasmoid.rootItem.isLoading
             text: "No transit data available"
@@ -78,7 +75,6 @@ Item {
             Layout.fillWidth: true
         }
         
-        // Legs and estimates
         Repeater {
             id: legsRepeater
             model: plasmoid.rootItem.legs
@@ -89,12 +85,10 @@ Item {
                 spacing: 8
                 width: parent.width
                 
-                // Line header with colored box and styled direction
                 RowLayout {
                     width: parent.width
                     spacing: 4
                     
-                    // Line number box
                     Rectangle {
                         width: lineLabel.width + 16
                         height: lineLabel.height + 8
@@ -110,7 +104,6 @@ Item {
                         }
                     }
                     
-                    // Direction label
                     RowLayout {
                         spacing: 8
                         
@@ -120,7 +113,6 @@ Item {
                             opacity: 0.7
                         }
                         
-                        // Direction value in a subtle box
                         Rectangle {
                             Layout.preferredWidth: directionLabel.implicitWidth + 12
                             height: directionLabel.height + 6
@@ -145,7 +137,6 @@ Item {
                     }
                 }
                 
-                // Create a fixed grid with proper cell alignment
                 GridLayout {
                     id: timesGrid
                     width: parent.width
@@ -157,7 +148,6 @@ Item {
                     property var departures: legEstimate && legEstimate.estimates ? 
                                             legEstimate.estimates : []
                     
-                    // Headers with station names
                     Column {
                         Layout.column: 0
                         Layout.fillWidth: true
@@ -204,7 +194,6 @@ Item {
                         }
                     }
                     
-                    // Generate times for each departure
                     Repeater {
                         model: timesGrid.departures
                         
@@ -252,7 +241,6 @@ Item {
                     }
                 }
                 
-                // Incidents
                 Repeater {
                     model: plasmoid.rootItem.estimates[modelData.id] && 
                            plasmoid.rootItem.estimates[modelData.id].incidents ? 
@@ -276,7 +264,6 @@ Item {
                     }
                 }
                 
-                // Separator
                 Rectangle {
                     width: parent.width
                     height: 1
@@ -292,7 +279,6 @@ Item {
         Item { Layout.fillHeight: true }
     }
     
-    // Force update when data changes
     Connections {
         target: plasmoid.rootItem
         function onEstimatesUpdated() {

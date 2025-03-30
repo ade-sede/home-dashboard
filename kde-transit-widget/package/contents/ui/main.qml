@@ -7,31 +7,24 @@ import org.kde.plasma.plasmoid 2.0
 Item {
     id: root
     
-    // Data properties
     property var legs: []
     property var estimates: ({})
     property bool isLoading: false
     
-    // Custom signals
     signal legsUpdated()
     signal estimatesUpdated()
     
-    // API configuration (from plasmoid configuration)
     property string serverUrl: plasmoid.configuration.serverUrl
     property string username: plasmoid.configuration.username
     property string password: plasmoid.configuration.password
     property string timeFormat: plasmoid.configuration.timeFormat
-    
-    // UI states
     Plasmoid.compactRepresentation: CompactRepresentation {}
     Plasmoid.fullRepresentation: FullRepresentation {}
     
-    // Force refresh the backend cache
     function forceRefreshCache() {
         var xhr = new XMLHttpRequest()
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
-                // After the cache is refreshed, fetch the legs data
                 fetchLegs()
             }
         }
@@ -42,7 +35,6 @@ Item {
         xhr.send(JSON.stringify({}))
     }
     
-    // Network calls
     function fetchLegs() {
         isLoading = true
         
@@ -52,9 +44,8 @@ Item {
                 if (xhr.status === 200) {
                     var data = JSON.parse(xhr.responseText)
                     legs = data.legs
-                    legsUpdated() // Emit custom signal
+                    legsUpdated()
                     
-                    // Fetch estimates for each leg
                     for (var i = 0; i < legs.length; i++) {
                         fetchEstimates(legs[i].id)
                     }
@@ -77,12 +68,11 @@ Item {
                 if (xhr.status === 200) {
                     var data = JSON.parse(xhr.responseText)
                     estimates[legId] = data
-                    estimatesUpdated() // Emit custom signal
+                    estimatesUpdated()
                 } else {
                     console.log("Error fetching estimates for leg " + legId + ": " + xhr.status)
                 }
                 
-                // Check if all estimates are loaded
                 var allLoaded = true
                 for (var i = 0; i < legs.length; i++) {
                     if (!estimates[legs[i].id]) {
@@ -103,19 +93,17 @@ Item {
         xhr.send()
     }
     
-    // Timer for auto-refresh
     property var nextRefreshTime: new Date()
     
     Timer {
         id: refreshTimer
-        interval: 60000 // Check every minute if we need to refresh
+        interval: 60000
         running: true
         repeat: true
         onTriggered: checkRefresh()
     }
     
     function updateNextRefreshTime() {
-        // Find the earliest departure time among all estimates
         var earliestTime = null
         
         for (var legId in estimates) {
@@ -132,7 +120,6 @@ Item {
         if (earliestTime !== null) {
             nextRefreshTime = earliestTime
         } else {
-            // If no estimates, refresh in 5 minutes
             var defaultTime = new Date()
             defaultTime.setMinutes(defaultTime.getMinutes() + 5)
             nextRefreshTime = defaultTime
@@ -146,7 +133,6 @@ Item {
         }
     }
     
-    // Utility functions
     function formatTime(timeString, delaySeconds) {
         var date = new Date(timeString)
         
@@ -157,11 +143,11 @@ Item {
         if (timeFormat === "24h") {
             return date.getHours() + ":" + 
                    (date.getMinutes() < 10 ? "0" : "") + date.getMinutes()
-        } else { // 12-hour format
+        } else {
             var hours = date.getHours()
             var ampm = hours >= 12 ? "PM" : "AM"
             hours = hours % 12
-            hours = hours ? hours : 12 // Convert 0 to 12
+            hours = hours ? hours : 12
             return hours + ":" + 
                    (date.getMinutes() < 10 ? "0" : "") + date.getMinutes() + 
                    " " + ampm
@@ -181,7 +167,6 @@ Item {
         return minutes + (minutes === 1 ? " min" : " mins")
     }
     
-    // Initial load and configuration changes
     Component.onCompleted: {
         fetchLegs()
     }

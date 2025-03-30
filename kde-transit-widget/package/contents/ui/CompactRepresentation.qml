@@ -8,7 +8,7 @@ Item {
     
     Layout.minimumWidth: 200
     Layout.preferredWidth: 250
-    Layout.minimumHeight: 38  // Reduced from 48
+    Layout.minimumHeight: 38
     
     MouseArea {
         anchors.fill: parent
@@ -17,20 +17,18 @@ Item {
     
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 1  // Reduced from 2
-        spacing: 1  // Reduced from 2
+        anchors.margins: 1
+        spacing: 1
         
-        // Show loading indicator when fetching data
         PlasmaComponents.BusyIndicator {
             id: busyIndicator
             Layout.alignment: Qt.AlignHCenter
             visible: plasmoid.rootItem.isLoading
             running: visible
-            Layout.preferredWidth: 16  // Smaller indicator
-            Layout.preferredHeight: 16  // Smaller indicator
+            Layout.preferredWidth: 16
+            Layout.preferredHeight: 16
         }
         
-        // Show each leg with its next departure
         Repeater {
             id: legsRepeater
             model: plasmoid.rootItem.legs
@@ -40,11 +38,10 @@ Item {
                 Layout.fillWidth: true
                 spacing: 4
                 
-                // Line number box
                 Rectangle {
-                    width: lineLabel.width + 8  // Reduced padding
-                    height: lineLabel.height + 4  // Reduced height
-                    radius: 3  // Smaller radius
+                    width: lineLabel.width + 8
+                    height: lineLabel.height + 4
+                    radius: 3
                     color: PlasmaCore.Theme.highlightColor
                     
                     PlasmaComponents.Label {
@@ -52,19 +49,18 @@ Item {
                         anchors.centerIn: parent
                         text: modelData.line_short_name
                         font.bold: true
-                        font.pixelSize: theme.smallestFont.pixelSize - 1  // Smaller font
+                        font.pixelSize: theme.smallestFont.pixelSize - 1
                         color: PlasmaCore.Theme.highlightedTextColor
                     }
                 }
                 
-                // Direction in a subtle box
                 Rectangle {
-                    Layout.preferredWidth: directionLabel.implicitWidth + 8  // Reduced padding
+                    Layout.preferredWidth: directionLabel.implicitWidth + 8
                     Layout.fillWidth: true
-                    height: directionLabel.height + 2  // Reduced height
+                    height: directionLabel.height + 2
                     color: PlasmaCore.Theme.backgroundColor
                     opacity: 0.5
-                    radius: 2  // Smaller radius
+                    radius: 2
                     border.width: 1
                     border.color: PlasmaCore.Theme.disabledTextColor
                     
@@ -73,7 +69,7 @@ Item {
                         anchors.centerIn: parent
                         text: modelData.trip_direction
                         font.italic: true
-                        font.pixelSize: theme.smallestFont.pixelSize - 1  // Smaller font
+                        font.pixelSize: theme.smallestFont.pixelSize - 1
                         elide: Text.ElideRight
                         width: parent.width - 8
                         horizontalAlignment: Text.AlignLeft
@@ -92,7 +88,7 @@ Item {
                     
                     Layout.minimumWidth: 36
                     font.bold: true
-                    font.pixelSize: theme.smallestFont.pixelSize - 1  // Smaller font
+                    font.pixelSize: theme.smallestFont.pixelSize - 1
                     color: nextDeparture && nextDeparture.delay ? "red" : theme.textColor
                     horizontalAlignment: Text.AlignRight
                 }
@@ -104,11 +100,10 @@ Item {
             text: "No transit data"
             horizontalAlignment: Text.AlignHCenter
             Layout.fillWidth: true
-            font.pixelSize: theme.smallestFont.pixelSize - 1  // Smaller font
+            font.pixelSize: theme.smallestFont.pixelSize - 1
         }
     }
     
-    // Force update when data changes
     Connections {
         target: plasmoid.rootItem
         function onEstimatesUpdated() {
