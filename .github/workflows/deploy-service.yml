@@ -108,7 +108,7 @@ jobs:
         run: |
           ssh deployer@$DEPLOY_HOST "
             # Set timeout and polling interval
-            timeout_seconds=30
+            timeout_seconds=120
             poll_interval=3
             end_time=\$((SECONDS + timeout_seconds))
             
