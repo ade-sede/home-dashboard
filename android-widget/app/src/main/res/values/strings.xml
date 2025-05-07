@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Transit Clock</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">Transit clock widget</string>
+    <string name="serverUrl">https://your-server.com</string>
+    <string name="username">username</string>
+    <string name="password">password</string>
+    <string name="departure_title">Departure from:</string>
+    <string name="arrival_title">Arrival at:</string>
+    <string name="reload">Reload</string>
+    <string name="loading">Loading...</string>
+
+</resources>

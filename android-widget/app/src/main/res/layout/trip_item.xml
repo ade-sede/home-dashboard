@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:id="@+id/trip_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="0dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/line_short"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/blue_rounded_border"
+            android:gravity="center"
+            android:text="L"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <!-- Trip time -->
+        <TextView
+            android:id="@+id/trip_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="0.7"
+            android:background="@drawable/rectangular_border"
+            android:gravity="center_vertical|start"
+            android:padding="8dp"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/trip_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:minWidth="60dp"
+            android:textSize="14sp"
+            android:gravity="end" />
+
+
+    </LinearLayout>
+</RelativeLayout>
